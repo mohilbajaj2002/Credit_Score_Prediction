@@ -1,29 +1,36 @@
+from sklearn.linear_model import Lasso
 from sklearn.pipeline import Pipeline
-import pandas as pd
-import preprocessors as pp
+from sklearn.preprocessing import MinMaxScaler
 
-CATEGORICAL_VARS = []
-df = pd.read_csv("datasets/dataset.csv")
-cols = df.columns
+from regression_model.processing import preprocessors as pp
+from regression_model.config import config
 
-for c in cols:
-    if (df[c].nunique() <= 15):
-        CATEGORICAL_VARS.append(c)
-
-train = df[:int(0.75*len(df))]
-test = df[int(0.75*len(df)):]
-
-f = open("datasets/feature_list.txt", "w")
-f.write(str(cols))
-f.close()
-
-train.to_csv("datasets/train.csv")
-test.to_csv("datasets/test.csv")
-
-PIPELINE_NAME = 'lasso_regression'
 
 price_pipe = Pipeline(
     [
-        ('categorical_imputer',
-         pp.CategoricalImputer(variables=CATEGORICAL_VARS)),
-    ])
+        (
+            "categorical_imputer",
+            pp.CategoricalImputer(variables_path=config.CATEGORICAL_VARS_FILE),
+        ),
+        (
+            "numerical_inputer",
+            pp.NumericalImputer(variables_path=config.NUMERICAL_VARS_FILE),
+        ),
+        (
+            "rare_label_encoder",
+            pp.RareLabelCategoricalEncoder(tol=0.01, variables_path=config.CATEGORICAL_VARS_FILE),
+        ),
+        (
+            "log_transformer",
+            pp.LogTransformer(variables_path=config.NUMERICAL_LOG_VARS_FILE)
+        ),
+        (
+            "scaler",
+            MinMaxScaler(),
+        ),
+        (
+            "Linear_model",
+            Lasso(alpha=0.005, random_state=0)
+        ),
+    ]
+)

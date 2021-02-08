@@ -1,30 +1,49 @@
-import pathlib
+import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
+import joblib
 
-PACKAGE_ROOT = pathlib.Path(__file__).resolve().parent
-TRAINED_MODEL_DIR = PACKAGE_ROOT / 'trained_models'
-DATASET_DIR = PACKAGE_ROOT / 'datasets'
-
-TESTING_DATA_FILE = DATASET_DIR / 'test.csv'
-TRAINING_DATA_FILE = DATASET_DIR / 'train.csv'
-FEATURE_FILE = DATASET_DIR / 'feature_list.txt'
-TARGET = 'y'
-
-f = open(FEATURE_FILE, "r")
-FEATURES = f.read()
+from regression_model import pipeline
+from regression_model.config import config
 
 
-def save_pipeline() -> None:
+
+def save_pipeline(*, pipeline_to_persist) -> None:
     """Persist the pipeline."""
 
-    pass
+    save_file_name = "regression_model.pkl"
+    save_path = config.TRAINED_MODEL_DIR / save_file_name
+    joblib.dump(pipeline_to_persist, save_path)
+
+    print("saved pipeline")
 
 
 def run_training() -> None:
     """Train the model."""
 
-    print('Training...')
+    # read final feature feature_list
+    #f = open(config.ALL_VARS_FILE, "r")
+    #FEATURES = f.read()
+    #FEATURES = FEATURES.strip().split(" ")
 
 
-if __name__ == '__main__':
+
+    # read training data
+    data = pd.read_csv(config.TRAINING_DATA_FILE)
+
+    # divide train and test
+    X_train, X_test, y_train, y_test = train_test_split(
+        data.iloc[:, :-1], data[config.TARGET], test_size=0.1, random_state=0
+    )  # we are setting the seed here
+
+    # transform the target
+    y_train = np.log(y_train)
+    
+    print('Data divided into training and test')
+    pipeline.price_pipe.fit(X_train, y_train)
+
+    save_pipeline(pipeline_to_persist=pipeline.price_pipe)
+
+
+if __name__ == "__main__":
     run_training()
