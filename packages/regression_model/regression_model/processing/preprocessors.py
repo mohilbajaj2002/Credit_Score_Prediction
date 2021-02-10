@@ -40,7 +40,12 @@ class CategoricalImputer(BaseEstimator, TransformerMixin):
         flag = 0
         X = X.copy()
         for feature in self.variables:
-            mode = X[feature].mode(dropna=True)[0]
+            try:
+                mode = X[feature].mode(dropna=True)[0]
+
+            except:
+                mode = 0
+
             X[feature] = X[feature].fillna(mode)
 
         for feature in self.variables:
@@ -82,7 +87,10 @@ class NumericalImputer(BaseEstimator, TransformerMixin):
         flag = 0
         X = X.copy()
         for feature in self.variables:
-            X[feature].fillna(self.imputer_dict_[feature], inplace=True)
+            try:
+                X[feature].fillna(self.imputer_dict_[feature], inplace=True)
+            except:
+                X[feature].fillna(0)
 
         for feature in self.variables:
             if not(X[feature].count() == len(X)):

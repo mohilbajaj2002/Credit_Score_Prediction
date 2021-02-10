@@ -5,31 +5,14 @@ import joblib
 
 from regression_model import pipeline
 from regression_model.config import config
-
-
-
-def save_pipeline(*, pipeline_to_persist) -> None:
-    """Persist the pipeline."""
-
-    save_file_name = "regression_model.pkl"
-    save_path = config.TRAINED_MODEL_DIR / save_file_name
-    joblib.dump(pipeline_to_persist, save_path)
-
-    print("saved pipeline")
+from regression_model.processing.data_management import load_dataset, save_pipeline
 
 
 def run_training() -> None:
     """Train the model."""
 
-    # read final feature feature_list
-    #f = open(config.ALL_VARS_FILE, "r")
-    #FEATURES = f.read()
-    #FEATURES = FEATURES.strip().split(" ")
-
-
-
     # read training data
-    data = pd.read_csv(config.TRAINING_DATA_FILE)
+    data = load_dataset(file_path_name=config.TRAINING_DATA_FILE)
 
     # divide train and test
     X_train, X_test, y_train, y_test = train_test_split(
@@ -38,7 +21,7 @@ def run_training() -> None:
 
     # transform the target
     y_train = np.log(y_train)
-    
+
     print('Data divided into training and test')
     pipeline.price_pipe.fit(X_train, y_train)
 
