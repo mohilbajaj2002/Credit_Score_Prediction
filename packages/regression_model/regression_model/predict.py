@@ -5,10 +5,16 @@ from regression_model.config import config
 from regression_model.processing.validation import validate_inputs
 from regression_model.processing.data_management import load_pipeline
 
+from regression_model import __version__ as _version
+import logging
 
-pipeline_file_name = config.TRAINED_MODEL_DIR / "regression_model.pkl"
+
+_logger = logging.getLogger(__name__)
+
+
+pipeline_file_name = f"{config.PIPELINE_SAVE_FILE}{_version}.pkl"
 _price_pipe = load_pipeline(file_name=pipeline_file_name)
-print('Persisted model loaded')
+#print('Persisted model loaded')
 
 
 def make_prediction(*, input_data) -> dict:
@@ -18,6 +24,12 @@ def make_prediction(*, input_data) -> dict:
     data = validate_inputs(input_data=data)
     prediction = _price_pipe.predict(data)
     output = np.exp(prediction)
-    response = {"predictions": output}
+    results = {"predictions": output, "version": _version}
 
-    return response
+    _logger.info(
+        f"Making predictions with model version: {_version} "
+        f"Inputs: {data} "
+        f"Predictions: {results}"
+    )
+
+    return results

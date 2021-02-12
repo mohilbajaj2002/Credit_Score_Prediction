@@ -13,5 +13,9 @@ FINAL_VARS_FILE = DATASET_DIR / 'diff3.txt'
 CATEGORICAL_VARS_FILE = DATASET_DIR / 'cat_vars.txt'
 NUMERICAL_VARS_FILE = DATASET_DIR / 'num_vars.txt'
 NUMERICAL_LOG_VARS_FILE = DATASET_DIR / 'num_log_vars.txt'
+
+PIPELINE_NAME = "lasso_regression"
+PIPELINE_SAVE_FILE = TRAINED_MODEL_DIR / f"{PIPELINE_NAME}_output_v"
+
 TARGET = 'y'
 alpha = 0.05

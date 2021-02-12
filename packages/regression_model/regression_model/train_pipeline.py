@@ -6,6 +6,12 @@ import joblib
 from regression_model import pipeline
 from regression_model.config import config
 from regression_model.processing.data_management import load_dataset, save_pipeline
+from regression_model import __version__ as _version
+
+import logging
+
+
+_logger = logging.getLogger(__name__)
 
 
 def run_training() -> None:
@@ -22,9 +28,10 @@ def run_training() -> None:
     # transform the target
     y_train = np.log(y_train)
 
-    print('Data divided into training and test')
+    #print('Data divided into training and test')
     pipeline.price_pipe.fit(X_train, y_train)
 
+    _logger.info(f"saving model version: {_version}")
     save_pipeline(pipeline_to_persist=pipeline.price_pipe)
 
 
