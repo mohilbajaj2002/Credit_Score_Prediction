@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from regression_model.predict import make_prediction
+from regression_model import __version__ as _version
 
+from api import __version__ as api_version
 from api.config import get_logger
 
 _logger = get_logger(logger_name=__name__)
@@ -14,6 +16,13 @@ def health():
     if request.method == 'GET':
         _logger.info('health status OK')
         return 'ok'
+
+
+@prediction_app.route('/version', methods=['GET'])
+def version():
+    if request.method == 'GET':
+        return jsonify({'model_version': _version,
+                        'api_version': api_version})
 
 
 @prediction_app.route('/v1/predict/regression', methods=['POST'])
